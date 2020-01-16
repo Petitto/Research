@@ -8,6 +8,8 @@ sigma = 1;              %standard deviation of the distribution
 
                 
 kernel = zeros(5,5);
+disp('Initial Kernel');
+disp(kernel);
 w = 0;                  %sum of elements of kernel
 for i = 1:5
     for j = 1:5
@@ -16,9 +18,11 @@ for i = 1:5
         w = w + kernel(i,j);
     end
 end
-
+disp('Kernel before division');
+disp(kernel);
 kernel = kernel/w;
-
+disp('Final kernel');
+disp(kernel);
 %now apply the filter to the image
 [m,n] = size(I);
 output = zeros(m,n);
