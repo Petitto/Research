@@ -18,6 +18,7 @@ for i = 1:5
         w = w + kernel(i,j);
     end
 end
+kernel = kernel *10;
 disp('Kernel before division');
 disp(kernel);
 kernel = kernel/w;
@@ -33,10 +34,15 @@ for i=1:m
         temp = Im(i:i+4, j:j+4);
         temp = double(temp);
         conv = temp.*kernel;
-        output(i,j) = sum(conv(:));
+        output(i,j) = sum(conv(:)); %sum of convolution
     end
 end
+
+
+
 output = uint8(output);
+f8 = figure;
+imshow(output),title('original gaussian filter');
 
 %show original and filtered image
 %figure(1);
