@@ -18,9 +18,7 @@ for i = 1:5
         w = w + kernel(i,j);
     end
 end
-kernel = kernel *10;
-disp('Kernel before division');
-disp(kernel);
+kernel = kernel*2;
 kernel = kernel/w;
 disp('Final kernel');
 disp(kernel);
@@ -38,26 +36,24 @@ for i=1:m
     end
 end
 
+Im2 = padarray(output,[2,2]);
+for i=1:m
+    for j=1:n
+        temp = Im2(i:i+4, j:j+4);
+        temp = double(temp);
+        conv = temp.*kernel;
+        output2(i,j) = sum(conv(:));
+    end
+end
+
+edgeDetection = output - output2;
 
 
-output = uint8(output);
-f8 = figure;
-imshow(output),title('original gaussian filter');
+subplot(2,2,1),imshow(I),title('original image');
 
-%show original and filtered image
-%figure(1);
-%set(gcf, 'Position', get(0,'Screensize'));
-f1 = figure;
-f2 = figure;
+subplot(2,2,2),imshow(output), title('First Blur');
 
-figure(f1);
-imshow(I),title('original image');
+subplot(2,2,3),imshow(output2),title('Second Blur');
 
-figure(f2);
-imshow(output), title('output of gaussian filter');
+subplot(2,2,4),imshow(edgeDetection),title('Difference of Gaussian');
 
-
-% Log_filter = fspecial('log', [5,5], 4.0); % fspecial creat predefined filter.Return a filter.
-%                                         % 25X25 Gaussian filter with SD =25 is created.
-% img_LOG = imfilter(img, Log_filter, 'symmetric', 'conv');
-% imshow(img_LOG, []);
