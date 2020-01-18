@@ -18,7 +18,7 @@ for i = 1:5
         w = w + kernel(i,j);
     end
 end
-kernel = kernel*2;
+kernel = kernel*100;
 kernel = kernel/w;
 disp('Final kernel');
 disp(kernel);
@@ -26,7 +26,7 @@ disp(kernel);
 [m,n] = size(I);
 output = zeros(m,n);
 Im = padarray(I,[2,2]);
-
+disp(Im);
 for i=1:m
     for j=1:n
         temp = Im(i:i+4, j:j+4);
@@ -48,6 +48,9 @@ end
 
 edgeDetection = output - output2;
 
+output = uint8(output);
+output2 = uint8(output2);
+edgeDetection = uint8(edgeDetection);
 
 subplot(2,2,1),imshow(I),title('original image');
 
