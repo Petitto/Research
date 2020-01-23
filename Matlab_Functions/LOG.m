@@ -8,8 +8,6 @@ sigma = 1;              %standard deviation of the distribution
 
                 
 kernel = zeros(5,5);
-disp('Initial Kernel');
-disp(kernel);
 w = 0;                  %sum of elements of kernel
 for i = 1:5
     for j = 1:5
@@ -20,7 +18,7 @@ for i = 1:5
 end
 kernel = kernel*100;
 kernel = kernel/w;
-disp('Final kernel');
+disp('Gaussian Kernel');
 disp(kernel);
 %now apply the filter to the image
 [m,n] = size(I);
@@ -46,11 +44,12 @@ for i=1:m
     end
 end
 
-edgeDetection = output - output2;
+diffOfGaus = output - output2;
+
 
 output = uint8(output);
 output2 = uint8(output2);
-edgeDetection = uint8(edgeDetection);
+diffOfGaus = uint8(diffOfGaus);
 
 subplot(2,2,1),imshow(I),title('original image');
 
@@ -58,5 +57,5 @@ subplot(2,2,2),imshow(output), title('First Blur');
 
 subplot(2,2,3),imshow(output2),title('Second Blur');
 
-subplot(2,2,4),imshow(edgeDetection),title('Difference of Gaussian');
+subplot(2,2,4),imshow(diffOfGaus),title('Difference of Gaussian');
 
