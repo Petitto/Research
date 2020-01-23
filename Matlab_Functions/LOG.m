@@ -2,9 +2,10 @@
 [img1, img1_dname] = uigetfile('*.jpeg');
 img = imread(fullfile(img1_dname, img1));
 I = rgb2gray(img);
+I = im2double(I(:,:,1));
 
 %making gaussian kernel
-sigma = 1;              %standard deviation of the distribution
+sigma = 30;              %standard deviation of the distribution
 
                 
 kernel = zeros(5,5);
@@ -16,15 +17,17 @@ for i = 1:5
         w = w + kernel(i,j);
     end
 end
-kernel = kernel*100;
+disp("kern1");
+disp(kernel);
+%kernel = kernel*100;
 kernel = kernel/w;
 disp('Gaussian Kernel');
 disp(kernel);
 %now apply the filter to the image
 [m,n] = size(I);
 output = zeros(m,n);
+output2 = zeros(m,n);
 Im = padarray(I,[2,2]);
-disp(Im);
 for i=1:m
     for j=1:n
         temp = Im(i:i+4, j:j+4);
@@ -45,11 +48,6 @@ for i=1:m
 end
 
 diffOfGaus = output - output2;
-
-
-output = uint8(output);
-output2 = uint8(output2);
-diffOfGaus = uint8(diffOfGaus);
 
 subplot(2,2,1),imshow(I),title('original image');
 

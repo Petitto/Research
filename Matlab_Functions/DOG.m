@@ -1,8 +1,9 @@
 [img1, img1_dname] = uigetfile('*.jpeg');
 img = imread(fullfile(img1_dname, img1));
+img = rgb2gray(img);
 img = im2double(img(:,:,1));
 
-blur1 = fspecial('gaussian', 21, 0.5);
+blur1 = fspecial('gaussian', 5, 1);
 blur2 = fspecial('gaussian', 21, 30);
 disp("test");
 disp(blur1);
