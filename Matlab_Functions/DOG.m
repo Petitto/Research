@@ -4,7 +4,7 @@ img = rgb2gray(img);
 img = im2double(img(:,:,1));
 %scale extrema and difference of gaussian
 %blur1 = fspecial('gaussian', 21, 1);
-blur = fspecial('gaussian', 21, sqrt(2));
+blur = fspecial('gaussian', 21, 8);
 % disp("test");
 % disp(blur);
 % disp("testover");
@@ -57,23 +57,46 @@ for i=1:m-2
         for r=1:3
             for c=1:3
                 if(r == 2 && c ==2)
-                    if(locateMat(r,c) > potentialPoint || locateMat2(r,c) > potentialPoint)
+                    if(locateMat(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
                         max = false;
-                    elseif(locateMat(r,c) < potentialPoint || locateMat2(r,c) < potentialPoint)
-                        min = false;
+%                         fprintf('Not a Max row: %d column: %d\n', r, c);
+%                         disp(locateMat(r,c));
+%                         disp(locateMat2(r,c));
+%                         disp(potentialPoint);
                     end
-                    
-                elseif(locateMat(r,c) > potentialPoint || locateMat1(r,c) > potentialPoint || locateMat2(r,c) > potentialPoint)
-                     max = false;
-                elseif(locateMat(r,c) < potentialPoint || locateMat1(r,c) < potentialPoint || locateMat2(r,c) < potentialPoint)
-                    min = false;
+                    if(locateMat(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
+                        min = false;
+%                         fprintf('Not a Min row: %d column: %d\n', r, c);
+%                         disp(locateMat(r,c));
+%                         disp(locateMat2(r,c));
+%                         disp(potentialPoint);
+                    end
+                % sum number of values greater and less than   
+                else
+                    if(locateMat(r,c) >= potentialPoint || locateMat1(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
+                         max = false;
+%                          fprintf('Not a Max row: %d column: %d\n', r, c);
+%                          disp(locateMat(r,c));
+%                          disp(locateMat1(r,c));
+%                          disp(locateMat2(r,c));
+%                          disp(potentialPoint);
+                    end
+                    if(locateMat(r,c) <= potentialPoint || locateMat1(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
+                        min = false;
+%                         fprintf('Not a Min row: %d column: %d\n', r, c);
+%                         disp(locateMat(r,c));
+%                         disp(locateMat1(r,c));
+%                         disp(locateMat2(r,c));
+%                         disp(potentialPoint);
+                    end
                 end
             end
         end
         
         if(min)
             disp('Min Value');
-            disp([i+1,j+1]);
+           % disp([i+1,j+1]);
+            disp(potentialPoint);
             disp('Dog');
             disp(locateMat);
             disp('Dog2');
@@ -89,15 +112,15 @@ for i=1:m-2
         
         if(max)
             disp('Max Value');
-            disp([i+1, j+1]);
+           % disp([i+1, j+1]);
+           disp(potentialPoint);
+           disp('Dog');
             disp(locateMat);
             disp('Dog2');
             disp(locateMat1);
             disp('Dog3');
             disp(locateMat2);
         end
-        max = true;
-        min = true;
     end
 end
 
