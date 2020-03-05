@@ -5,7 +5,7 @@ img = im2double(img(:,:,1));
 
 %scale extrema and difference of gaussian
 %blur1 = fspecial('gaussian', 21, 1);
-blur = fspecial('gaussian', 21, 8);
+blur = fspecial('gaussian', 21, (2)^(1/3));
 blurImgArr = {};
 for i=1:19
     if(i == 1)
@@ -20,13 +20,15 @@ end
 % image4 = conv2(image3, blur, 'same');
 numBlurImg = size(blurImgArr);
 diffOfGau = {};
-for i=1:numBlurImg-1
+
+for i=1:numBlurImg(2)
     if(i == 1)
         diffOfGau{end+1} = img - blurImgArr{i};
     else
         diffOfGau{end+1} = blurImgArr{i} - blurImgArr{i-1};
     end
 end
+
 % dog = image1-image2;
 % dog1 = image2-image3;
 % dog2 = image3-image4;
@@ -35,8 +37,14 @@ end
 % padDog = padarray(dog, [1,1], 'both');
 % padDog1 = padarray(dog1, [1,1], 'both');
 % padDog2 = padarray(dog2, [1,1], 'both');
+
+padDiffOfGaus = {};
+for i=1:numBlurImg(2)
+    padDiffOfGaus{end+1} = padarray(diffOfGau{i}, [1,1], 'both');
+end
+
 figure(1);
-for i=1:numBlurImg
+for i=1:numBlurImg(2)
     subplot(2,10,i),imshow(blurImgArr{i});
 end
 % figure(1);
@@ -58,6 +66,9 @@ xpos = [];
 ypos = [];
 keypoints = [];
 [m,n]  = size(padDog);
+% for c=1:18
+%     padDog=diffOfGau{c}
+%     padDog2=diffOfGau{c+1}
 for i=1:m-2
     for j=1:n-2
         max = true;
@@ -90,30 +101,28 @@ for i=1:m-2
         end
        
         if(min)
-            xpos = [xpos i];
-            ypos = [ypos j];
+            xpos = [xpos j];
+            ypos = [ypos i];
             keypoints = [keypoints potentialPoint];
             
         end
         
         if(max)
-            xpos = [xpos i];
-            ypos = [ypos j];
+            xpos = [xpos j];
+            ypos = [ypos i];
             keypoints = [keypoints potentialPoint];
         end
     end
 end
 
 len = size(xpos);
+figure(2);
+imshow(img); hold on;
 for i=1:len(2)
     fprintf('X-Pos: %d Y-Pos: %d Keypoint: %f\n',xpos(i), ypos(i), keypoints(i));
-    img(xpos(i), ypos(i), 1) = 255;
-    img(xpos(i), ypos(i), 2) = 0;
-    img(xpos(i), ypos(i), 3) = 0;
+    plot(xpos(i), ypos(i), 'o');
 end
 
-figure(3);
-imshow(img);
 
 
 
