@@ -5,122 +5,103 @@ img = im2double(img(:,:,1));
 
 %scale extrema and difference of gaussian
 %blur1 = fspecial('gaussian', 21, 1);
-blur = fspecial('gaussian', 21, (2)^(1/3));
+blur = fspecial('gaussian', 21, 8);
 blurImgArr = {};
-for i=1:19
-    if(i == 1)
-        blurImgArr{end+1} = conv2(img, blur, 'same');
-    else
-        blurImgArr{end+1} = conv2(blurImgArr{i-1}, blur, 'same');
+octave = cell(5,5);
+for r=1:5
+    for c=1:5
+        if(r==1 && c==1)
+            octave{r,c} = img;
+        elseif(c==1)
+            octave{r,c} = octave{r-1,4};
+        else
+            octave{r,c} = conv2(octave{r,c-1}, blur, 'same');
+        end     
     end
 end
-% image1 = conv2(img, blur, 'same');
-% image2 = conv2(image1, blur, 'same');
-% image3 = conv2(image2, blur, 'same');
-% image4 = conv2(image3, blur, 'same');
+
 numBlurImg = size(blurImgArr);
-diffOfGau = {};
+diffOfGau = cell(4,4);
 
-for i=1:numBlurImg(2)
-    if(i == 1)
-        diffOfGau{end+1} = img - blurImgArr{i};
-    else
-        diffOfGau{end+1} = blurImgArr{i} - blurImgArr{i-1};
+for r=1:4
+    for c=1:4
+        diffOfGau{r,c} = padarray(octave{r,c} - octave{r,c+1}, [1,1], 'both');
     end
 end
 
-% dog = image1-image2;
-% dog1 = image2-image3;
-% dog2 = image3-image4;
-
-%padding dog for easier computation
-% padDog = padarray(dog, [1,1], 'both');
-% padDog1 = padarray(dog1, [1,1], 'both');
-% padDog2 = padarray(dog2, [1,1], 'both');
-
-padDiffOfGaus = {};
-for i=1:numBlurImg(2)
-    padDiffOfGaus{end+1} = padarray(diffOfGau{i}, [1,1], 'both');
+for r=1:5
+    figure(r);
+    for c=1:5    
+        subplot(1,5,c),imshow(octave{r,c});
+    end
 end
 
-figure(1);
-for i=1:numBlurImg(2)
-    subplot(2,10,i),imshow(blurImgArr{i});
-end
-% figure(1);
-% subplot(2,2,1),imshow(img),title('original image');
-% subplot(2,2,2),imshow(dog), title('DOG');
-% subplot(2,2,3),imshow(dog1),title('DOG 1');
-% subplot(2,2,4),imshow(dog2), title('DOG 2');
-% 
-% figure(2);
-% subplot(2,2,1),imshow(image1),title('Blur 1');
-% subplot(2,2,2),imshow(image2), title('Blur 2');
-% subplot(2,2,3),imshow(image3),title('Blur 3');
-% subplot(2,2,4),imshow(image4), title('Blur 4');
+%finding keypointsx
+xpos = {};
+ypos = {};
+keypoints = {};
+[m,n]  = size(diffOfGau{1,1});
 
-%finding keypoints
-localMax = zeros(1,2);
-localMin = zeros(1,2);
-xpos = [];
-ypos = [];
-keypoints = [];
-[m,n]  = size(padDog);
-% for c=1:18
-%     padDog=diffOfGau{c}
-%     padDog2=diffOfGau{c+1}
-for i=1:m-2
-    for j=1:n-2
-        max = true;
-        min = true;
-        
-        locateMat = padDog(i:i+2, j:j+2);
-        locateMat1 = padDog1(i:i+2, j:j+2);
-        locateMat2 = padDog2(i:i+2, j:j+2);
-        potentialPoint = locateMat1(2,2);
-        
-        for r=1:3
-            for c=1:3
-                if(r == 2 && c ==2)
-                    if(locateMat(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
-                        max = false;
+for row=1:4
+    for col=1:4-2
+        for r=1:m-2
+            for j=1:n-2
+                max = true;
+                min = true;
+
+                locateMat = diffOfGau{row,col}(r:r+2, j:j+2);
+                locateMat1 = diffOfGau{row,col+1}(r:r+2, j:j+2);
+                locateMat2 = diffOfGau{row,col+2}(r:r+2, j:j+2);
+                potentialPoint = locateMat1(2,2);
+
+                for r=1:3
+                    for c=1:3
+                        if(r == 2 && c ==2)
+                            if(locateMat(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
+                                max = false;
+                            end
+                            if(locateMat(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
+                                min = false;
+                            end
+                        % sum number of values greater and less than   
+                        else
+                            if(locateMat(r,c) >= potentialPoint || locateMat1(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
+                                 max = false;
+                            end
+                            if(locateMat(r,c) <= potentialPoint || locateMat1(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
+                                min = false;
+                            end
+                        end
                     end
-                    if(locateMat(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
-                        min = false;
-                    end
-                % sum number of values greater and less than   
-                else
-                    if(locateMat(r,c) >= potentialPoint || locateMat1(r,c) >= potentialPoint || locateMat2(r,c) >= potentialPoint)
-                         max = false;
-                    end
-                    if(locateMat(r,c) <= potentialPoint || locateMat1(r,c) <= potentialPoint || locateMat2(r,c) <= potentialPoint)
-                        min = false;
-                    end
+                end
+
+                if(min)
+                    xpos{row, end+1} = j;
+                    ypos{row, end+1} = r;
+                    keypoints{row, end+1} = potentialPoint;
+
+                end
+
+                if(max)
+                   xpos{row, end+1} = j;
+                   ypos{row, end+1} = r;
+                   keypoints{row, end+1} = potentialPoint;
                 end
             end
         end
-       
-        if(min)
-            xpos = [xpos j];
-            ypos = [ypos i];
-            keypoints = [keypoints potentialPoint];
-            
-        end
-        
-        if(max)
-            xpos = [xpos j];
-            ypos = [ypos i];
-            keypoints = [keypoints potentialPoint];
-        end
     end
 end
 
-len = size(xpos);
-figure(2);
+
+[m,n] = size(xpos);
+figure(6);
 imshow(img); hold on;
-for i=1:len(2)
-    fprintf('X-Pos: %d Y-Pos: %d Keypoint: %f\n',xpos(i), ypos(i), keypoints(i));
-    plot(xpos(i), ypos(i), 'o');
+for r=1:m
+    for c=1:n
+        fprintf('X-Pos: %d Y-Pos: %d Keypoint: %f\n',xpos{r,c}, ypos{r,c}, keypoints{r,c});
+        plot(xpos{r,c}, ypos{r,c}, 'o');
+    end
+    
 end
 
 
