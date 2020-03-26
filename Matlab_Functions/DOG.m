@@ -4,16 +4,22 @@ img = rgb2gray(img);
 img = im2double(img(:,:,1));
 
 %scale extrema and difference of gaussian
-%blur1 = fspecial('gaussian', 21, 1);
-blur = fspecial('gaussian', 21, 8);
+
+%figure out kernel size
+blur = fspecial('gaussian', 100, sqrt(2));
+figure(7)
+testimg = conv2(img,fspecial('gaussian', 100, 2),'same');
+imshow(testimg)
+
 blurImgArr = {};
 octave = cell(5,5);
+%blur by exact values instead of previous image
 for r=1:5
     for c=1:5
         if(r==1 && c==1)
-            octave{r,c} = img;
+            octave{r,c} = conv2(img, blur, 'same');
         elseif(c==1)
-            octave{r,c} = octave{r-1,4};
+            octave{r,c} = octave{r-1,3};
         else
             octave{r,c} = conv2(octave{r,c-1}, blur, 'same');
         end     
@@ -21,9 +27,9 @@ for r=1:5
 end
 
 numBlurImg = size(blurImgArr);
-diffOfGau = cell(4,4);
+diffOfGau = cell(5,4);
 
-for r=1:4
+for r=1:5
     for c=1:4
         diffOfGau{r,c} = padarray(octave{r,c} - octave{r,c+1}, [1,1], 'both');
     end
@@ -36,13 +42,14 @@ for r=1:5
     end
 end
 
-%finding keypointsx
-xpos = {};
-ypos = {};
-keypoints = {};
+%finding keypoints
+%fix memory allocation
+xpos = [5,:];
+ypos = [5,:];
+keypoints = [5,:];
 [m,n]  = size(diffOfGau{1,1});
 
-for row=1:4
+for row=1:5
     for col=1:4-2
         for r=1:m-2
             for j=1:n-2
